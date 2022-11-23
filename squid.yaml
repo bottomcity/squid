@@ -1,35 +1,38 @@
 manifestVersion: subsquid.io/v0.1
-namespace: squid
-
-name: balances-batch-dzlzv
+name: sample-squid
+version: 1
 description: |-
-  The very first squid from manifest
-tags:
-  - balances
+  The very first squid from manifest  
 
-database:
-  type: pg-14
+build: 
 
-api:
-  cmd: [ "npx", "squid-graphql-server" ]
-  graphql-examples:
-    - query: |-
-        query MyQuery {
-          accountsConnection(orderBy: id_ASC) {
-            edges {
-              node {
-                  id
-              }
-            }
-          }
-        }
-      variables: {} # optional
-processor:
-  init:
-    - name: db-migrate
-      cmd: [ "npx" ,"sqd", "db", "migrate" ]
+deploy:
+  addons:
+    postgres: 
+         # additional configs for addons
+         version: 14
+ # set of secrets that must be defined by the environment
+  secrets:
+    - ACALA_RPC_ENDPOINT
+    - COINGECKO_API_KEY 
+  processor:
+    environment:
+        SQD_DEBUG=sqd:mapping
+    env:
+       - .deploy.env  # add env variables from a file
+    cmd: [ "node", "lib/processor" ] 
+  api:
+    # custom command
+    cmd: [ "npx", "squid-graphql-server", "--subscriptions", "--max-root-fields", "10", "--sql-statement-timeout", "1000" ] 
 
-#  secrets:
-#    - name: SECRET_ENV_NAME
-
-  cmd: [ "node", "lib/processor" ]
+scale:
+  addons:
+     postgres:
+         read-replicas: 1
+         storage: 100G
+  processor:
+     profile: p1.medium
+  api:
+     profile: a1.large
+     # add three replicas
+     replicas: 3
