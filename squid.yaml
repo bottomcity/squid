@@ -9,30 +9,7 @@ build:
 deploy:
   addons:
     postgres: 
-         # additional configs for addons
-         version: 14
- # set of secrets that must be defined by the environment
-  secrets:
-    - ACALA_RPC_ENDPOINT
-    - COINGECKO_API_KEY 
   processor:
-    environment:
-        SQD_DEBUG=sqd:mapping
-    env:
-       - .deploy.env  # add env variables from a file
     cmd: [ "node", "lib/processor" ] 
   api:
-    # custom command
-    cmd: [ "npx", "squid-graphql-server", "--subscriptions", "--max-root-fields", "10", "--sql-statement-timeout", "1000" ] 
-
-scale:
-  addons:
-     postgres:
-         read-replicas: 1
-         storage: 100G
-  processor:
-     profile: p1.medium
-  api:
-     profile: a1.large
-     # add three replicas
-     replicas: 3
+    cmd: [ "npx", "squid-graphql-server"]
