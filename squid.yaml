@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
-name: sample-squid
-version: 1
+name: secondsquid
+version: 999999
 description: |-
   The very first squid from manifest  
 
